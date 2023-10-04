@@ -3,6 +3,7 @@ import subprocess
 import sys
 import select
 import git
+from envbash import load_envbash
 
 class EvaluateFailure():
     def __init__(self):
@@ -19,16 +20,17 @@ class EvaluateFailure():
         self.pcd_file_path = ""
         os.chdir(self.autoware_path)
         print("The Current working directory now is: {0}".format(os.getcwd()))
-        
+
         # Time period for searching
         self.date_to_stop_searching = "" #Please write it in format of "year-month-day" like that "2023-09-31"
         
         
-        # Internal datastructures 
+        # Internal datastructures and variables
         self.repos_path = []
         self.repo_commits = []
         self.max_repo_commits_length = 0
         self.repos_commits_dict={}
+        self.clean_autoware_first_time = True
 
     def get_repos_paths(self):
         ''' 
@@ -119,11 +121,11 @@ class EvaluateFailure():
             self.repos_commits_dict[repo_path] = repo_commits
         print("max_repo_commits_length = " , self.max_repo_commits_length)
 
-    def run_subprocess_with_capture_and_print(self, cmd):
+    def run_subprocess_with_capture_and_print(self, cmd, use_shell=False):
         ''' 
         TBD
         '''
-        p = subprocess.Popen(cmd,
+        p = subprocess.Popen(cmd,shell=use_shell,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
         stdout = []
@@ -148,6 +150,14 @@ class EvaluateFailure():
         
         return stdout, stderr
     
+    def clean_autoware(self):
+        ''' 
+        TBD
+        '''
+        cmd = ["rm","-r","build/","install/", "log/"]
+        stdout, stderr = self.run_subprocess_with_capture_and_print(cmd)
+        return stdout, stderr
+    
     def compile_autoware(self):
         ''' 
         TBD
@@ -156,9 +166,6 @@ class EvaluateFailure():
         stdout, stderr = self.run_subprocess_with_capture_and_print(cmd)
         print('Compilate Ended')
         return stdout, stderr
-        
-        #print('stdout:', "".join(stdout))
-        #print('stderr:', "".join(stderr))
 
     def check_autoware_compile_output(self, compile_stdout):
         ''' 
@@ -168,7 +175,26 @@ class EvaluateFailure():
             if "Aborted" in msg or "Failed" in msg:
                 return False
         return True
+
+    def source_autoware(self):
+        ''' 
+        TBD
+        '''
+        setup_script = self.autoware_path+"/install/setup.bash"
+        load_envbash(setup_script)
+
     
+    def import_repos(self):
+        ''' 
+        TBD
+        '''
+        #cmd = "vcs import /home/ahmed/Data/Work/LeoDrive/Technical/projects/autoware/autoware/src < /home/ahmed/Data/Work/LeoDrive/Technical/projects/autoware/autoware/autoware.repos && vcs pull /home/ahmed/Data/Work/LeoDrive/Technical/projects/autoware/autoware/src"
+        cmd = "vcs import "+ self.autoware_path+"/src < "+ self.repos_file_path+ " && vcs pull "+ self.autoware_path+"/src"
+        print(cmd)
+        stdout, stderr = self.run_subprocess_with_capture_and_print(cmd, use_shell=True)
+        print('Importing Ended')
+        return stdout, stderr
+
     def run_scenario_simulator(self):
         ''' 
         TBD
@@ -234,11 +260,19 @@ class EvaluateFailure():
         '''
         scenario_pass = False
         last_changed_repo = "empty"
-        last_change_commit = "empty"
+        last_changed_commit = "empty"
         index = -1
+        self.import_repos()
         self.get_repos_paths()
         self.get_repos_commits_dict()
-        self.compile_autoware()
+        if self.clean_autoware_first_time:
+            self.clean_autoware()
+        compile_stdout, compile_stderr = self.compile_autoware()
+        compile_pass = self.check_autoware_compile_output(compile_stdout)
+        if not compile_pass:
+            print("Autoware is not compiling with your original repos file. Please check carefully then run the tool")
+            sys.exit()
+        self.source_autoware()
         sim_stdout, sim_stderr = self.run_scenario_simulator()
         sim_pass = self.check_scenario_simulator_output(sim_stdout)
         if sim_pass:
@@ -258,9 +292,10 @@ class EvaluateFailure():
                 print("Compiling Autoware")
                 compile_stdout, compile_stderr = self.compile_autoware()
                 compile_pass = self.check_autoware_compile_output(compile_stdout)
-                #if compile fail .. contine
+                #if compile fail .. continue
                 if not compile_pass:
                     continue
+                self.source_autoware()
                 # run sim
                 print("Running Scenario Simulator")
                 sim_stdout, sim_stderr = self.run_scenario_simulator()
@@ -270,7 +305,7 @@ class EvaluateFailure():
                     print("Found the repos that made the scenario pass with all iterations")
                     scenario_pass = True
                     last_changed_repo = repo
-                    last_change_commit = self.repos_commits_dict[repo][i]
+                    last_changed_commit = self.repos_commits_dict[repo][i]
                     index = i - 1
                     break
                     #create repos file
@@ -281,7 +316,7 @@ class EvaluateFailure():
             print("The script is not able to find the success/fail border")
         else:
             print("Last changed repo was : ", last_changed_repo)
-            print("Last commit that was passing : ", last_change_commit)
+            print("Last commit that was passing : ", last_changed_commit)
             self.print_repos_before_first_success(index)
 
 
