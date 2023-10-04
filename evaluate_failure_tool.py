@@ -188,7 +188,6 @@ class EvaluateFailure():
         ''' 
         TBD
         '''
-        #cmd = "vcs import /home/ahmed/Data/Work/LeoDrive/Technical/projects/autoware/autoware/src < /home/ahmed/Data/Work/LeoDrive/Technical/projects/autoware/autoware/autoware.repos && vcs pull /home/ahmed/Data/Work/LeoDrive/Technical/projects/autoware/autoware/src"
         cmd = "vcs import "+ self.autoware_path+"/src < "+ self.repos_file_path+ " && vcs pull "+ self.autoware_path+"/src"
         print(cmd)
         stdout, stderr = self.run_subprocess_with_capture_and_print(cmd, use_shell=True)
