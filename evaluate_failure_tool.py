@@ -12,7 +12,7 @@ class EvaluateFailure():
         '''
 
         # Directories and Paths
-        # Please use abosulute paths
+        # Please use absolute paths
         self.repos_file_path = ""
         self.autoware_path = ""
         self.scenario_file_path = ""
@@ -30,7 +30,10 @@ class EvaluateFailure():
         self.repo_commits = []
         self.max_repo_commits_length = 0
         self.repos_commits_dict={}
+        self.failed_repos_commits_dict={}
+        self.failed_repos_commits_dict={}
         self.clean_autoware_first_time = True
+        
 
     def get_repos_paths(self):
         ''' 
@@ -90,8 +93,15 @@ class EvaluateFailure():
                 continue
             for idx in range(idx1 + len(sub1) + 1, idx2):
                 res = res + s[idx]
+            # Sometimes there are a merge information between commit and auther.
+            # It shows like that after the commit id "\nMerge: commit_id commit_id" 
+            # So we need to check that and remove the merge info if exists
+            if "Merge:" in res:
+                res = res[:res.index("\n")]
             commits.append(res)
             #print(res)
+        
+        
         return commits
     
     def get_repos_commits_dict(self):
@@ -240,18 +250,48 @@ class EvaluateFailure():
                 return True
         return False
     
-    def print_repos_before_first_success(self, index):
+    def get_and_print_repos_before_first_success(self, index):
         ''' 
         TBD
         '''
         for repo in self.repos_commits_dict.keys():
             commit = "empty"
+            repo_base_name = os.path.basename(os.path.normpath(repo))
             if index > len(self.repos_commits_dict[repo]) - 1 :
                 commit = self.repos_commits_dict[repo][len(self.repos_commits_dict[repo]) - 1]
+                self.failed_repos_commits_dict[repo_base_name] = commit
             else :
                 commit = self.repos_commits_dict[repo][index]
-            print("Repo Name : ", repo, "\nCommit ID : ", commit)
+                self.failed_repos_commits_dict[repo_base_name] = commit
+            print("Repo Name : ", repo_base_name, "\nCommit ID : ", commit)
             print("--------////-------")
+
+    def create_failed_repo_file(self):
+        failed_scenario_name = os.path.basename(os.path.normpath(self.scenario_file_path))
+        failed_dotrepos_file_name = "scenario_"+failed_scenario_name+"_failed_commits.repos"
+        version = "empty"
+        # open both files 
+        with open(self.repos_file_path,'r') as original_dotrepos_file, open(failed_dotrepos_file_name,'w') as failed_dotrepos_file: 
+            # read content from original file 
+            for line in original_dotrepos_file:
+                if "version:" in line:
+                    line = "    version: "+commit_id+"\n"
+                    failed_dotrepos_file.write(line)
+                    continue
+                for repo in self.failed_repos_commits_dict.keys():
+                    if repo in line:
+                        commit_id = self.failed_repos_commits_dict[repo]
+                        break
+
+                # write content to new file  (failed repos)
+                failed_dotrepos_file.write(line)
+    
+    def create_last_changed_file(self, last_changed_repo, last_changed_commit):
+        with open('last_changed_repo.txt','w') as last_changed_repo_file:
+            last_changed_repo_file.write("Last changed repo was : " + last_changed_repo + "\nLast commit that was passing : "+ last_changed_commit)
+
+
+
 
     def run(self):
         ''' 
@@ -316,7 +356,9 @@ class EvaluateFailure():
         else:
             print("Last changed repo was : ", last_changed_repo)
             print("Last commit that was passing : ", last_changed_commit)
-            self.print_repos_before_first_success(index)
+            self.get_and_print_repos_before_first_success(index)
+            self.create_failed_repo_file()
+            self.create_last_changed_file(last_changed_repo, last_changed_commit)
 
 
 if __name__ == "__main__":
