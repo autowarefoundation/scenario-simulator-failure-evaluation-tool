@@ -73,10 +73,10 @@ Both two files are located in `autoware_path` after execution is done.
 - Add a buggy commit to universe that is making autoware keep the vehicle standstill in start location.
 - Stage and commit it to have the commit id.
 - Go to .repos file and replace the version of autoware.universe with your buggy commit id.
-- You can use the files under `testing_files` folder and following [initialization](#initialization) then [Usage](#usage) sections.
+- You can use the files under `testing_files` folder and following [Initialization](#initialization) then [Usage](#usage) sections.
 - The output should be as described [here](#what-is-the-expected-output-when-a-failing-scenario-becomes-passing-in-one-iteration).
 
-TO-DO:
+## TO-DO:
 - Investigate global timeout
 - Enable passing arguments to the python script instead of initializing variables in the class constructor
 - Complete the functions description instead of TBD
