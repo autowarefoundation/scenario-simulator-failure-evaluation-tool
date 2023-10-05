@@ -69,7 +69,12 @@ This tool is still WIP and it is expected to have improvements and fixes while t
 
 Both two files are located in `autoware_path` after execution is done.
 
-    
+### How to make a quick test ? 
+- Add a buggy commit to universe that is making autoware keep the vehicle standstill in start location.
+- Stage and commit it to have the commit id.
+- Go to .repos file and replace the version of autoware.universe with your buggy commit id.
+- You can use the files under `testing_files` folder and following [initialization](#initialization) then [Usage](#usage) sections.
+- The output should be as described [here](#what-is-the-expected-output-when-a-failing-scenario-becomes-passing-in-one-iteration).
 
 TO-DO:
 - Investigate global timeout
