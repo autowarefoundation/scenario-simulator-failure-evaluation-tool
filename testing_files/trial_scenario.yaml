@@ -31,9 +31,9 @@ OpenSCENARIO:
     CatalogLocation: []
   RoadNetwork:
     LogicFile:
-      filepath: /home/ahmed/Data/Work/LeoDrive/Technical/projects/TierIV/lanelet2_map.osm
+      filepath: osm file
     SceneGraphFile:
-      filepath: /home/ahmed/Data/Work/LeoDrive/Technical/projects/TierIV/MGRS_ytu_campus_080422_applanix_vlp16_GS_RDP_SOR_DENOISED_MERGED-Cloud_0_5_downsampled_with_CC_space.pcd
+      filepath: pcd file
     TrafficSignals:
       TrafficSignalController: []
   Entities:
