@@ -49,7 +49,7 @@ This tool is still WIP and it is expected to have improvements and fixes while t
 
 ### What does the tool do for you ?
 - The tool checks out the commits specified by the .repos file
-- The tool add in scenario yaml file the correct paths for osm and pcd file so you do not need to do that manually.
+- The tool adds the paths of osm and pcd files in the scenario yaml file so you do not need to do that manually.
 - The tool cleans log, install, and build folder to start clean compilate for your evaluation process
 - If the .repos file is not making autoware compile successfully, the tool will terminate and print a message for you in command line to check and try again.
 - The tool sources the setup.bash file if autoware compilate is successful
