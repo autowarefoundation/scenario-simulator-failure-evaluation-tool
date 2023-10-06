@@ -3,7 +3,8 @@ This is the repository for scenario simulator failure evaluation tool. The tool 
 
 
 ~~~
-This tool is still WIP and it is expected to have improvements and fixes while testing it in different use cases
+This tool is still WIP.
+It is expected to have improvements and fixes while testing it in different use cases.
 ~~~
 
 ## How to use 
@@ -20,8 +21,8 @@ This tool is still WIP and it is expected to have improvements and fixes while t
     `pip3 install envbash`
 
 ### Initialization
-- The tool will support in very soon future getting arguments from command line.
-- But, till that time, the tool user will need to open the python script, got to class constructor which is `def __init__(self):` and assign values for paths and search date.
+- The tool will support in the very soon future getting arguments from the command line.
+- But, till that time, the tool user will need to open the python script, go to class constructor which is `def __init__(self):` and assign values for paths and search date.
     -  `repos_file_path`
     
         This is path of the .repos file that includes the commits of the repos that you would like to start the evaluation process from.
@@ -41,40 +42,41 @@ This tool is still WIP and it is expected to have improvements and fixes while t
     - `date_to_stop_searching`
 
         This is the date you would like the tool to stop searching for commits. This is the date you believe autoware was passing for that specific scenario and tool will start to search when it starts to fail starting from the commits you provided in the .repos file back to this date.
+    > Date should be in "year-month-day" like that "2023-09-31"
 
 ### Usage
 - From command line, go to the directory of the `scenario-simulator-failure-evaluation-tool`
-- Make sure that the `evaluate_failure_tool.py` has the permission to be executed as program.
+- Make sure that the `evaluate_failure_tool.py` has the permission to be executed as a program.
 - Then type `python3 evaluate_failure_tool.py`
 
 ### What does the tool do for you ?
 - The tool checks out the commits specified by the .repos file
 - The tool adds the paths of osm and pcd files in the scenario yaml file so you do not need to do that manually.
-- The tool cleans log, install, and build folder to start clean compilate for your evaluation process
+- The tool cleans log, install, and build folders to start clean autoware compilation for your evaluation process
 - If the .repos file is not making autoware compile successfully, the tool will terminate and print a message for you in command line to check and try again.
-- The tool sources the setup.bash file if autoware compilate is successful
-- The tool run scenario simulator with the provided scenario file and checks if the scenario with all its iterations is passing or not
+- The tool sources the setup.bash file if autoware compilation is successful
+- The tool runs scenario simulator with the provided scenario file and checks if the scenario with all its iterations is passing or not
 - If the scenario is passing with your .repos file, the tool will let you know that it is already passing and no need to go over the repos.
-- If the scenario is already failing with your .repos file (expected), the tool will start iterating over the repo going back one by one until it stops by the search date you provided.
-- Whenever the tool comes to a combination of commits that is making autoware not compiling, the tool does not invoke scenario simulator
-- When the tool comes to a combination of commits that is compiling autoware successfully and passing in scenario simulator, it stops the searching process and prints and creates the output for you.
+- If the scenario is already failing with your .repos file (expected), the tool will start iterating over the repos going back one by one until it stops by the search date you provided.
+- Whenever the tool comes to a combination of commits that is making autoware not compiling, the tool does not invoke the scenario simulator
+- When the tool comes to a combination of commits that is compiling autoware successfully and passing in the scenario simulator, it stops the searching process and prints and creates the output for you.
 
 ### What is the expected output when a failing scenario becomes passing in one iteration ?
-- The tool provides the output printed in command line and same information in two separate files.
+- The tool provides the output printed in the command line and same information in two separate files.
   - `last_changed_repo.txt`
 
     This file includes the repo and commit id that are lately changed for the successful trial. That means, this is the commit that the tool just checked out, then the scenario passed.
   - `$scenario_name$_failed_commits.repos`
   
-    This is the .repos file that includes the commit ids that you use to start debuggin autoware for that failing scenario. That means it includes the commit just before the successful trial.
+    This is the .repos file that includes the commit ids that you use to start debugging autoware for that failing scenario. That means it includes the commit just before the successful trial.
 
-Both two files are located in `autoware_path` after execution is done.
+Both files are located in `autoware_path` after execution is done.
 
 ### How to make a quick test ? 
-- Add a buggy commit to universe that is making autoware keep the vehicle standstill in start location.
+- Add a buggy commit to the autoware.universe that is making autoware keep the vehicle standstill in the start location.
 - Stage and commit it to have the commit id.
-- Go to .repos file and replace the version of autoware.universe with your buggy commit id.
-- You can use the files under `testing_files` folder and following [Initialization](#initialization) then [Usage](#usage) sections.
+- Go to the .repos file and replace the version of autoware.universe with your buggy commit id.
+- You can use the files under `testing_files` folder and follow [Initialization](#initialization) then [Usage](#usage) sections.
 - The output should be as described [here](#what-is-the-expected-output-when-a-failing-scenario-becomes-passing-in-one-iteration).
 
 ## TO-DO:
