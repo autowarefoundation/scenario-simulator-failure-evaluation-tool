@@ -31,7 +31,6 @@ class EvaluateFailure():
         self.max_repo_commits_length = 0
         self.repos_commits_dict={}
         self.failed_repos_commits_dict={}
-        self.failed_repos_commits_dict={}
         self.clean_autoware_first_time = True
         
 
