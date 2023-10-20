@@ -1,3 +1,4 @@
+```mermaid
 gantt
     title Git Issues - days since last update
     dateFormat X
@@ -23,3 +24,4 @@ gantt
     eaf9f684dc092ee1681221b7e724081ff1f0833f    : milestone, 42, 49
     section tier4_ad_api_adaptor
     a58468edcdaf8698153c85e93fe23807edcb8187    : milestone, 0, 7
+```
