@@ -3,6 +3,8 @@ import subprocess
 import sys
 import select
 import git
+from dateutil.parser import parse
+import datetime
 from envbash import load_envbash
 
 class EvaluateFailure():
@@ -28,8 +30,11 @@ class EvaluateFailure():
         # Internal datastructures and variables
         self.repos_path = []
         self.repo_commits = []
+        self.repo_dates = []
         self.max_repo_commits_length = 0
         self.repos_commits_dict={}
+        self.repos_dates_dict={}
+        self.repos_currently_checkedout_index_dict={}
         self.failed_repos_commits_dict={}
         self.clean_autoware_first_time = True
         
@@ -103,7 +108,29 @@ class EvaluateFailure():
         
         return commits
     
-    def get_repos_commits_dict(self):
+    def get_dates(self, splitted_log_info):
+        ''' 
+        TBD
+        '''
+        sub1 = "Date:"
+        sub2 = "\n\n"
+        dates = []
+        for s in splitted_log_info:
+            res = ''
+            try:
+                idx1 = s.index(sub1)
+                idx2 = s.index(sub2)
+        
+            except ValueError:
+                print("Oops!  That was no valid number.  Try again...")
+                continue
+            for idx in range(idx1 + len(sub1) + 1, idx2):
+                res = res + s[idx]
+            dates.append(parse(res))
+            #print(res)
+        return dates
+    
+    def get_repos_commits_dates_dict(self):
         ''' 
         TBD
         '''
@@ -121,6 +148,7 @@ class EvaluateFailure():
             #if  splitted_log:
             #print(len(splitted_log))
             repo_commits = self.get_commits(splitted_log)
+            repo_dates = self.get_dates(splitted_log)
             if len(repo_commits) > self.max_repo_commits_length:
                 self.max_repo_commits_length = len(repo_commits)
             print(repo_commits)
@@ -128,6 +156,8 @@ class EvaluateFailure():
             #   print(repo_path, " does not have any commits in this time period")
             print("------/////////////////**************\\\\\\\\\\\-----------")
             self.repos_commits_dict[repo_path] = repo_commits
+            self.repos_dates_dict[repo_path] = repo_dates
+            self.repos_currently_checkedout_index_dict[repo_path] = 0
         print("max_repo_commits_length = " , self.max_repo_commits_length)
 
     def run_subprocess_with_capture_and_print(self, cmd, use_shell=False):
@@ -190,7 +220,7 @@ class EvaluateFailure():
         TBD
         '''
         setup_script = self.autoware_path+"/install/setup.bash"
-        load_envbash(setup_script)
+        load_envbash(setup_script, override=True)
 
     
     def import_repos(self):
@@ -290,6 +320,31 @@ class EvaluateFailure():
             last_changed_repo_file.write("Last changed repo was : " + last_changed_repo + "\nLast commit that was passing : "+ last_changed_commit)
 
 
+    def create_mermaid_visualization(self):
+        with open('README.md','w') as mermaid_vis_file:
+            mermaid_vis_file.write("```mermaid\n")
+            mermaid_vis_file.write("---\n")
+            mermaid_vis_file.write("displayMode: compact\n")
+            mermaid_vis_file.write("---\n")
+            mermaid_vis_file.write("gantt\n")
+            mermaid_vis_file.write("    title Scenario Simulator Failure Evaluation Tool Visualization Sample Output\n")
+            mermaid_vis_file.write("    dateFormat YYYY-MM-DD HH:mm:ss\n")
+            mermaid_vis_file.write("    axisFormat %Y-%m-%d %X\n")    
+            mermaid_vis_file.write("    tickInterval 1day\n")
+            for repo in self.repos_commits_dict.keys():
+                dates = self.repos_dates_dict[repo]
+                iterator = 0
+                mermaid_vis_file.write("    section "+os.path.basename(os.path.normpath(repo))+"\n")
+                for commit in self.repos_commits_dict[repo]:
+                    if dates[iterator].date() <  datetime.datetime.strptime(self.date_to_stop_searching, '%Y-%m-%d').date():
+                        continue
+                    if iterator == self.repos_currently_checkedout_index_dict[repo]:
+                        mermaid_vis_file.write("    "+commit[:6]+" : crit, milestone, "+ str(dates[iterator])+ ", 4h\n")
+                    else:
+                        mermaid_vis_file.write("    "+commit[:6]+" : milestone, "+ str(dates[iterator])+ ", 4h\n")
+
+                    iterator = iterator+1
+
 
 
     def run(self):
@@ -326,6 +381,8 @@ class EvaluateFailure():
                 print("Checking out repo", repo, "of commit id ", self.repos_commits_dict[repo][i])
                 repo_git = git.Git(repo)
                 repo_git.checkout(self.repos_commits_dict[repo][i])
+                current_repo_checkedout_index = self.repos_currently_checkedout_index_dict[repo] + 1
+                self.repos_currently_checkedout_index_dict[repo] = current_repo_checkedout_index
                 #compile
                 print("Compiling Autoware")
                 compile_stdout, compile_stderr = self.compile_autoware()
@@ -333,7 +390,7 @@ class EvaluateFailure():
                 #if compile fail .. continue
                 if not compile_pass:
                     continue
-                self.source_autoware()
+                #self.source_autoware()
                 # run sim
                 print("Running Scenario Simulator")
                 sim_stdout, sim_stderr = self.run_scenario_simulator()
@@ -355,6 +412,7 @@ class EvaluateFailure():
         else:
             print("Last changed repo was : ", last_changed_repo)
             print("Last commit that was passing : ", last_changed_commit)
+            self.create_mermaid_visualization()
             self.get_and_print_repos_before_first_success(index)
             self.create_failed_repo_file()
             self.create_last_changed_file(last_changed_repo, last_changed_commit)
