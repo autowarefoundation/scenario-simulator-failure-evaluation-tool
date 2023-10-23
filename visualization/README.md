@@ -1,6 +1,6 @@
 ```mermaid
 gantt
-    title Git Issues - days since last update
+    Autoware Repos Sample Output
     dateFormat X
     axisFormat %s
     section autoware_msgs
