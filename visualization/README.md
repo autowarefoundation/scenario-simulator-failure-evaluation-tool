@@ -1,6 +1,6 @@
 ```mermaid
 gantt
-    Autoware Repos Sample Output
+    title Autoware Repos Sample Output
     dateFormat X
     axisFormat %s
     section autoware_msgs
