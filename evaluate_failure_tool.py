@@ -344,6 +344,7 @@ class EvaluateFailure():
                         mermaid_vis_file.write("    "+commit[:6]+" : milestone, "+ str(dates[iterator])+ ", 4h\n")
 
                     iterator = iterator+1
+            mermaid_vis_file.write("```\n")
 
 
 
