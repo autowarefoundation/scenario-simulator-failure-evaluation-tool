@@ -80,11 +80,11 @@ Both files are located in `autoware_path` after execution is done.
 - The output should be as described [here](#what-is-the-expected-output-when-a-failing-scenario-becomes-passing-in-one-iteration).
 
 ### Visualization
-The visualization provided by scenario simulator failure evaluation tool is a simple representation of the different Autoware repositories and commits, indicating at the time of the scenario became successful which commit was checked out in different repositories, the commit that lastly checkout that made the scenario successful, and the commit after it that is highly suspected to be the commit causing this failure.
+The visualization provided by scenario simulator failure evaluation tool is a simple representation of the different Autoware repositories and commits, indicating **_at the time of the scenario became successful_** which commit was checked out in different repositories, the commit that lastly checked-out that made the scenario successful, and the commit after it that is highly suspected to be the commit causing this failure.
 
 The visualization depends on [mermaid gantt chart](https://mermaid.js.org/syntax/gantt.html) syntax.
 
-> It is worth mentioning that visualization does not include any commits that are older than date to stop searching. This trimming made it the visualization more making sense and more comfortable for the user to understand, specially that there are repo that are not frequently changed and has a single commit very long time from the time we are doing the evaluation
+> It is worth mentioning that visualization does not include any commits that are older than date to stop searching `date_to_stop_searching`. This trimming made it the visualization more making sense and more comfortable for the user to understand, specially that there are repo that are not frequently changed and has a single commit very long time from the time we are doing the evaluation
 
 The visualization output comes in a README.md file and it is as well located for now in `autoware_path` like the other two files.
 
@@ -103,7 +103,7 @@ The visualization output comes in a README.md file and it is as well located for
 - Between every vertical line, there are rhombuses with 6 digits beside each rhombus.
   - These rhombuses are the commits for each repositories
   - The 6 digits are the commit IDs
-  - They are organized from left to right in chronological order (newest to oldest)
+  - They are organized from right to left in chronological order (newest to oldest)
   - The commits right to each vertical line are the commits pushed for this day.
 - The following table explains the different colors you may see in the visualization chart
 
