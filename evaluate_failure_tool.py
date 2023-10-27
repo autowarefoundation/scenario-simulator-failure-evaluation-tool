@@ -37,7 +37,8 @@ class EvaluateFailure():
         self.repos_currently_checkedout_index_dict={}
         self.failed_repos_commits_dict={}
         self.clean_autoware_first_time = True
-        
+        self.last_changed_repo = "empty"
+        self.last_changed_commit = "empty"
 
     def get_repos_paths(self):
         ''' 
@@ -315,17 +316,15 @@ class EvaluateFailure():
                 # write content to new file  (failed repos)
                 failed_dotrepos_file.write(line)
     
-    def create_last_changed_file(self, last_changed_repo, last_changed_commit):
+    def create_last_changed_file(self):
         with open('last_changed_repo.txt','w') as last_changed_repo_file:
-            last_changed_repo_file.write("Last changed repo was : " + last_changed_repo + "\nLast commit that was passing : "+ last_changed_commit)
+            last_changed_repo_file.write("Last changed repo was : " + self.last_changed_repo + "\n")
+            last_changed_repo_file.write("Last commit that was passing : "+ self.last_changed_commit + "\n")
 
 
     def create_mermaid_visualization(self):
         with open('README.md','w') as mermaid_vis_file:
             mermaid_vis_file.write("```mermaid\n")
-            mermaid_vis_file.write("---\n")
-            mermaid_vis_file.write("displayMode: compact\n")
-            mermaid_vis_file.write("---\n")
             mermaid_vis_file.write("gantt\n")
             mermaid_vis_file.write("    title Scenario Simulator Failure Evaluation Tool Visualization Sample Output\n")
             mermaid_vis_file.write("    dateFormat YYYY-MM-DD HH:mm:ss\n")
@@ -338,10 +337,19 @@ class EvaluateFailure():
                 for commit in self.repos_commits_dict[repo]:
                     if dates[iterator].date() <  datetime.datetime.strptime(self.date_to_stop_searching, '%Y-%m-%d').date():
                         continue
+                    if repo == self.last_changed_repo:
+                        if iterator == self.repos_currently_checkedout_index_dict[repo]:
+                            mermaid_vis_file.write("    "+commit[:6]+" : done, crit, milestone, "+ str(dates[iterator])+ ", \n")
+                        if iterator == self.repos_currently_checkedout_index_dict[repo] - 1:
+                            mermaid_vis_file.write("    "+commit[:6]+" : active, milestone, "+ str(dates[iterator])+ ", \n")
+                        else:
+                            mermaid_vis_file.write("    "+commit[:6]+" : milestone, "+ str(dates[iterator])+ ", \n")
+                        continue
+
                     if iterator == self.repos_currently_checkedout_index_dict[repo]:
-                        mermaid_vis_file.write("    "+commit[:6]+" : crit, milestone, "+ str(dates[iterator])+ ", 4h\n")
+                        mermaid_vis_file.write("    "+commit[:6]+" : crit, milestone, "+ str(dates[iterator])+ ", \n")
                     else:
-                        mermaid_vis_file.write("    "+commit[:6]+" : milestone, "+ str(dates[iterator])+ ", 4h\n")
+                        mermaid_vis_file.write("    "+commit[:6]+" : milestone, "+ str(dates[iterator])+ ", \n")
 
                     iterator = iterator+1
             mermaid_vis_file.write("```\n")
@@ -353,8 +361,6 @@ class EvaluateFailure():
         TBD
         '''
         scenario_pass = False
-        last_changed_repo = "empty"
-        last_changed_commit = "empty"
         index = -1
         self.import_repos()
         self.get_repos_paths()
@@ -400,8 +406,8 @@ class EvaluateFailure():
                 if sim_pass:
                     print("Found the repos that made the scenario pass with all iterations")
                     scenario_pass = True
-                    last_changed_repo = repo
-                    last_changed_commit = self.repos_commits_dict[repo][i]
+                    self.last_changed_repo = repo
+                    self.last_changed_commit = self.repos_commits_dict[repo][i]
                     index = i - 1
                     break
                     #create repos file
@@ -411,12 +417,12 @@ class EvaluateFailure():
         if scenario_pass == False :
             print("The script is not able to find the success/fail border")
         else:
-            print("Last changed repo was : ", last_changed_repo)
-            print("Last commit that was passing : ", last_changed_commit)
+            print("Last changed repo was : ", self.last_changed_repo)
+            print("Last commit that was passing : ", self.last_changed_commit)
             self.create_mermaid_visualization()
             self.get_and_print_repos_before_first_success(index)
             self.create_failed_repo_file()
-            self.create_last_changed_file(last_changed_repo, last_changed_commit)
+            self.create_last_changed_file()
 
 
 if __name__ == "__main__":
