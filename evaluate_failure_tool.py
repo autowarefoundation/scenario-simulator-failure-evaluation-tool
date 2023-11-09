@@ -79,7 +79,7 @@ class EvaluateFailure():
                     continue
                 for idx in range(idx1 + len(sub1) + 1, idx2):
                     res = res + s[idx]
-                if ' ' in res or "simulator" in res:
+                if ' ' in res:
                     continue
                 self.repos_path.append(self.autoware_path+"/src/"+res)
         #print(res)
