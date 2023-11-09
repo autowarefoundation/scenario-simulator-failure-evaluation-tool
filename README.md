@@ -42,10 +42,17 @@ It is expected to have improvements and fixes while testing it in different use 
 	- `date_to_start_searching`
 
     	This is the date you would like the tool to start searching for commits.
+
+
 	- `date_to_stop_searching`
 
     	This is the date you would like the tool to stop searching for commits.
+
 	> Dates should be in "year-month-day" like that "2023-09-31"
+	
+~~~
+When using date_to_start_searching, all repos have to be in the correct branch before using them.
+~~~
 
 ### Usage
 - From command line, go to the directory of the `scenario-simulator-failure-evaluation-tool`
