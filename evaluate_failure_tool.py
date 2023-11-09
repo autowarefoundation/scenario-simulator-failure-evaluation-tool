@@ -10,7 +10,7 @@ from envbash import load_envbash
 class EvaluateFailure():
     def __init__(self):
         ''' 
-        Class constructor
+        Class constructor - used when setting arguments in the code
         '''
 
         # Directories and Paths
@@ -20,14 +20,33 @@ class EvaluateFailure():
         self.scenario_file_path = ""
         self.osm_file_path = ""
         self.pcd_file_path = ""
-        os.chdir(self.autoware_path)
-        print("The Current working directory now is: {0}".format(os.getcwd()))
 
         # Time period for searching
         self.date_to_start_searching = ""  #Please write it in format of "year-month-day" like that "2023-09-31"
         self.date_to_stop_searching  = ""  #Please write it in format of "year-month-day" like that "2023-09-31"
-        
-        
+
+        self.init()
+
+    def __init__(self, repo_file_path, autoware_path, scenario_file_path, osm_file_path, pcd_file_path, date_to_start_searching, date_to_stop_searching):
+        ''' 
+        Class constructor - used when setting arguments from command line
+        '''
+        self.repos_file_path = repo_file_path
+        self.autoware_path = autoware_path
+        self.scenario_file_path = scenario_file_path
+        self.osm_file_path = osm_file_path
+        self.pcd_file_path = pcd_file_path
+        self.date_to_start_searching = date_to_start_searching
+        self.date_to_stop_searching = date_to_stop_searching
+
+        self.init()
+
+    def init(self):
+        ''' 
+        TBD
+        '''
+        os.chdir(self.autoware_path)
+        print("The Current working directory now is: {0}".format(os.getcwd()))
         # Internal datastructures and variables
         self.repos_path = []
         self.repo_commits = []
@@ -40,6 +59,7 @@ class EvaluateFailure():
         self.clean_autoware_first_time = True
         self.last_changed_repo = "empty"
         self.last_changed_commit = "empty"
+
 
     def get_repos_paths(self):
         ''' 
@@ -237,6 +257,8 @@ class EvaluateFailure():
     
     def checkout_at_start_date(self):
         for repo in self.repos_path:
+            if "autoware.universe" in repo:
+                continue
             repo_git = git.Git(repo)
             branch_name = repo_git.branch()
             os.chdir(repo)
@@ -312,6 +334,9 @@ class EvaluateFailure():
             print("--------////-------")
 
     def create_failed_repo_file(self):
+        ''' 
+        TBD
+        '''
         failed_scenario_name = os.path.basename(os.path.normpath(self.scenario_file_path))
         failed_dotrepos_file_name = "scenario_"+failed_scenario_name+"_failed_commits.repos"
         version = "empty"
@@ -332,12 +357,18 @@ class EvaluateFailure():
                 failed_dotrepos_file.write(line)
     
     def create_last_changed_file(self):
+        ''' 
+        TBD
+        '''
         with open('last_changed_repo.txt','w') as last_changed_repo_file:
             last_changed_repo_file.write("Last changed repo was : " + self.last_changed_repo + "\n")
             last_changed_repo_file.write("Last commit that was passing : "+ self.last_changed_commit + "\n")
 
 
     def create_mermaid_visualization(self):
+        ''' 
+        TBD
+        '''
         with open('README.md','w') as mermaid_vis_file:
             mermaid_vis_file.write("```mermaid\n")
             mermaid_vis_file.write("gantt\n")
@@ -441,5 +472,22 @@ class EvaluateFailure():
 
 
 if __name__ == "__main__":
-    eval_fail = EvaluateFailure()
+    number_of_arguments = len(sys.argv)
+    if number_of_arguments == 1:
+        eval_fail = EvaluateFailure()
+    elif number_of_arguments == 8:
+        repo_file_path = sys.argv[1]
+        autoware_path = sys.argv[2]
+        scenario_file_path = sys.argv[3]
+        osm_file_path = sys.argv[4]
+        pcd_file_path = sys.argv[5]
+        date_to_start_searching = sys.argv[6]
+        date_to_stop_searching = sys.argv[7]
+
+        eval_fail = EvaluateFailure(repo_file_path, autoware_path, scenario_file_path, osm_file_path, pcd_file_path, date_to_start_searching, date_to_stop_searching)
+    else:
+        print("Number of arguments is not sufficient to run the evaluation systems")
+        print("Please check the documentation and try again")
+        sys.exit()
+    
     eval_fail.run()

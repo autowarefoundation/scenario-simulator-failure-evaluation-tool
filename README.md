@@ -21,8 +21,8 @@ It is expected to have improvements and fixes while testing it in different use 
 	`pip3 install envbash`
 
 ### Initialization
-- The tool will support in the very soon future getting arguments from the command line.
-- But, till that time, the tool user will need to open the python script, go to class constructor which is `def __init__(self):` and assign values for paths and search date.
+- The tool supports both calling the script with passing needed arguments from command line or setting these needed arguments in the class constructor.
+- If the tool user would like to set the needed arguments in the class constructor, then s/he needs to open the python script, go to the first class constructor which is `def __init__(self):` and assign values for paths and search date.
 	-  `repos_file_path`
     
     	This is path of the .repos file that includes the commits of the repos that you would like to start the evaluation process from.
@@ -39,15 +39,31 @@ It is expected to have improvements and fixes while testing it in different use 
 
     	This is the pcd file associated with the used map file
 	> All previous paths have to be in absolute paths
+	- `date_to_start_searching`
+
+    	This is the date you would like the tool to start searching for commits.
 	- `date_to_stop_searching`
 
-    	This is the date you would like the tool to stop searching for commits. This is the date you believe autoware was passing for that specific scenario and tool will start to search when it starts to fail starting from the commits you provided in the .repos file back to this date.
-	> Date should be in "year-month-day" like that "2023-09-31"
+    	This is the date you would like the tool to stop searching for commits.
+	> Dates should be in "year-month-day" like that "2023-09-31"
 
 ### Usage
 - From command line, go to the directory of the `scenario-simulator-failure-evaluation-tool`
 - Make sure that the `evaluate_failure_tool.py` has the permission to be executed as a program.
-- Then type `python3 evaluate_failure_tool.py`
+- If you have set the arguments using code change in class constructor : 
+
+  `python3 evaluate_failure_tool.py`
+- If you would like to pass tha arguments from command line :
+  
+  `python3 evaluate_failure_tool.py repos_file_path autoware_path scenario_file_path osm_file_path pcd_file_path date_to_start_searching date_to_stop_searching`
+
+> Please note the format of the arguments as mentioned in [initialization section](#initialization).
+
+
+~~~
+The tool does not perform any plausability checks to the arguments passed from command line, except the number of arguments.
+Till this moment, it is the responsiblity of the tool user to make sure that arguments are correct and making sense, otherwise the tool will either crash or provide wrong output.
+~~~
 
 ### What does the tool do for you ?
 - The tool checks out the commits specified by the .repos file
@@ -60,6 +76,7 @@ It is expected to have improvements and fixes while testing it in different use 
 - If the scenario is already failing with your .repos file (expected), the tool will start iterating over the repos going back one by one until it stops by the search date you provided.
 - Whenever the tool comes to a combination of commits that is making autoware not compiling, the tool does not invoke the scenario simulator
 - When the tool comes to a combination of commits that is compiling autoware successfully and passing in the scenario simulator, it stops the searching process and prints and creates the output for you.
+- The tool provides a mermaid visualization for the Autoware user in order to easily check which commits were being used when the scenario passed
 
 ### What is the expected output when a failing scenario becomes passing in one iteration ?
 - The tool provides the output printed in the command line and the same information in two separate files.
@@ -119,10 +136,8 @@ The visualization output comes in a README.md file and it is as well located for
 
 ## TO-DO:
 - Investigate global timeout
-- Enable passing arguments to the python script instead of initializing variables in the class constructor
 - Complete the functions description instead of TBD
 - Draw a flowchart explaining how the tool works
-- Add date to start searching
 
 
 
