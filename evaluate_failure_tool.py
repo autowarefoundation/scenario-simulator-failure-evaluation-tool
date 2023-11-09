@@ -24,7 +24,8 @@ class EvaluateFailure():
         print("The Current working directory now is: {0}".format(os.getcwd()))
 
         # Time period for searching
-        self.date_to_stop_searching = "" #Please write it in format of "year-month-day" like that "2023-09-31"
+        self.date_to_start_searching = ""  #Please write it in format of "year-month-day" like that "2023-09-31"
+        self.date_to_stop_searching  = ""  #Please write it in format of "year-month-day" like that "2023-09-31"
         
         
         # Internal datastructures and variables
@@ -233,6 +234,20 @@ class EvaluateFailure():
         stdout, stderr = self.run_subprocess_with_capture_and_print(cmd, use_shell=True)
         print('Importing Ended')
         return stdout, stderr
+    
+    def checkout_at_start_date(self):
+        for repo in self.repos_path:
+            repo_git = git.Git(repo)
+            branch_name = repo_git.branch()
+            os.chdir(repo)
+            cmd = "git checkout `git rev-list -n 1 --before="+ self.date_to_start_searching + " " + branch_name[2:]+"`"
+            stdout, stderr = self.run_subprocess_with_capture_and_print(cmd, use_shell=True)
+                   
+        print('Checkout Ended')
+        os.chdir(self.autoware_path)
+        return stdout, stderr
+
+
 
     def run_scenario_simulator(self):
         ''' 
@@ -361,8 +376,9 @@ class EvaluateFailure():
         '''
         scenario_pass = False
         index = -1
-        self.import_repos()
+        #self.import_repos()
         self.get_repos_paths()
+        self.checkout_at_start_date()
         self.get_repos_commits_dates_dict()
         if self.clean_autoware_first_time:
             self.clean_autoware()
