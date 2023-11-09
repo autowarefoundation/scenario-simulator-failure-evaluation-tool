@@ -25,7 +25,7 @@ It is expected to have improvements and fixes while testing it in different use 
 - If the tool user would like to set the needed arguments in the class constructor, then s/he needs to open the python script, go to the first class constructor which is `def __init__(self):` and assign values for paths and search date.
 	-  `repos_file_path`
     
-    	This is path of the .repos file that includes the commits of the repos that you would like to start the evaluation process from.
+    	This is the path of the .repos file that includes the commits of the repos that you would like to start the evaluation process from.
 	- `autoware_path`
 
     	This is the path of autoware in your local machine
@@ -49,7 +49,7 @@ It is expected to have improvements and fixes while testing it in different use 
     	This is the date you would like the tool to stop searching for commits.
 
 	> Dates should be in "year-month-day" like that "2023-09-31"
-	
+
 ~~~
 When using date_to_start_searching, all repos have to be in the correct branch before using them.
 ~~~
@@ -60,7 +60,7 @@ When using date_to_start_searching, all repos have to be in the correct branch b
 - If you have set the arguments using code change in class constructor : 
 
   `python3 evaluate_failure_tool.py`
-- If you would like to pass tha arguments from command line :
+- If you would like to pass the arguments from command line :
   
   `python3 evaluate_failure_tool.py repos_file_path autoware_path scenario_file_path osm_file_path pcd_file_path date_to_start_searching date_to_stop_searching`
 
@@ -68,8 +68,8 @@ When using date_to_start_searching, all repos have to be in the correct branch b
 
 
 ~~~
-The tool does not perform any plausability checks to the arguments passed from command line, except the number of arguments.
-Till this moment, it is the responsiblity of the tool user to make sure that arguments are correct and making sense, otherwise the tool will either crash or provide wrong output.
+The tool does not perform any plausibility checks to the arguments passed from command line, except the number of arguments.
+Till this moment, it is the responsibility of the tool user to make sure that arguments are correct and making sense, otherwise the tool will either crash or provide wrong output.
 ~~~
 
 ### What does the tool do for you ?
