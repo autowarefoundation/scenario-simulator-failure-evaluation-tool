@@ -344,12 +344,11 @@ class EvaluateFailure():
                             mermaid_vis_file.write("    "+commit[:6]+" : active, milestone, "+ str(dates[iterator])+ ", \n")
                         else:
                             mermaid_vis_file.write("    "+commit[:6]+" : milestone, "+ str(dates[iterator])+ ", \n")
-                        continue
-
-                    if iterator == self.repos_currently_checkedout_index_dict[repo]:
-                        mermaid_vis_file.write("    "+commit[:6]+" : crit, milestone, "+ str(dates[iterator])+ ", \n")
                     else:
-                        mermaid_vis_file.write("    "+commit[:6]+" : milestone, "+ str(dates[iterator])+ ", \n")
+                        if iterator == self.repos_currently_checkedout_index_dict[repo]:
+                            mermaid_vis_file.write("    "+commit[:6]+" : crit, milestone, "+ str(dates[iterator])+ ", \n")
+                        else:
+                            mermaid_vis_file.write("    "+commit[:6]+" : milestone, "+ str(dates[iterator])+ ", \n")
 
                     iterator = iterator+1
             mermaid_vis_file.write("```\n")
@@ -364,7 +363,7 @@ class EvaluateFailure():
         index = -1
         self.import_repos()
         self.get_repos_paths()
-        self.get_repos_commits_dict()
+        self.get_repos_commits_dates_dict()
         if self.clean_autoware_first_time:
             self.clean_autoware()
         compile_stdout, compile_stderr = self.compile_autoware()
