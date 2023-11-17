@@ -11,6 +11,14 @@ class EvaluateFailure():
     def __init__(self):
         ''' 
         Class constructor - used when setting arguments in the code
+
+        Arguments
+        ---------
+        None
+
+        Returns
+        -------
+        None
         '''
 
         # Directories and Paths
@@ -30,6 +38,28 @@ class EvaluateFailure():
     def __init__(self, repo_file_path, autoware_path, scenario_file_path, osm_file_path, pcd_file_path, date_to_start_searching, date_to_stop_searching):
         ''' 
         Class constructor - used when setting arguments from command line
+
+        Arguments
+        ---------
+        repo_file_path : string
+            This is the path of the .repos file that includes the commits of the repos that you would like to 
+            start the evaluation process from.
+        autoware_path : string
+            This is the path of autoware in your local machine
+        scenario_file_path : string
+            This is the path of the failing scenario that would like to check which commits are causing this failure
+        osm_file_path : string
+            This is the osm map file used by this scenario
+        pcd_file_path : string
+            This is the pcd file associated with the used map file
+        date_to_start_searching : string
+            This is the date you would like the tool to start searching for commits.
+        date_to_stop_searching : string
+            This is the date you would like the tool to stop searching for commits.
+        
+        Returns
+        -------
+        None
         '''
         self.repos_file_path = repo_file_path
         self.autoware_path = autoware_path
@@ -43,7 +73,16 @@ class EvaluateFailure():
 
     def init(self):
         ''' 
-        TBD
+        This is an initialization function that is used to initialzize common variables and data structures.
+        This function is called by any of the class constructors before using any different function of the class.
+
+        Arguments
+        ---------
+        None
+
+        Returns
+        -------
+        None
         '''
         os.chdir(self.autoware_path)
         print("The Current working directory now is: {0}".format(os.getcwd()))
@@ -63,7 +102,16 @@ class EvaluateFailure():
 
     def get_repos_paths(self):
         ''' 
-        TBD
+        Format absolute repositories paths from .repos file
+
+        Arguments
+        ---------
+        None
+
+        Returns
+        -------
+        repos_path : array of strings
+            array of absolute paths for different repositories found in .repos file
         '''
         with open(self.repos_file_path, "r") as file:
             repos_file_lines = file.readlines()
@@ -87,7 +135,18 @@ class EvaluateFailure():
         
     def split_log_info(self, repo_log):
         ''' 
-        TBD
+        Helper function that is used to split any git repository log message based on commit
+        Each commit log message is stored in any entery of log array
+
+        Arguments
+        ---------
+        repo_log : string
+            This is the text out of performing git log for a repository
+
+        Returns
+        -------
+        splitted_log_info : array of strings
+            array log info but splitted per commits, each commit log in one entry of the array
         '''
         delimiter = "\n\ncommit "
         counter = 0
@@ -103,7 +162,17 @@ class EvaluateFailure():
     
     def get_commits(self, splitted_log_info):
         ''' 
-        TBD
+        Gets commit ids of a git repository based on its splitted log info
+
+        Arguments
+        ---------
+        splitted_log_info : array of string
+            Git repository log info but splitted per commit
+
+        Returns
+        -------
+        commits : array of strings
+            array contains the commit ids of this repository, each id in one entry of the array
         '''
         sub1 = "commit"
         sub2 = "\nAuthor"
@@ -132,7 +201,17 @@ class EvaluateFailure():
     
     def get_dates(self, splitted_log_info):
         ''' 
-        TBD
+        Gets commits dates of a git repository based on its splitted log info
+
+        Arguments
+        ---------
+        splitted_log_info : array of string
+            Git repository log info but splitted per commit
+
+        Returns
+        -------
+        dates : array of strings
+            array contains the dates of commits of this repository, each date in one entry of the array
         '''
         sub1 = "Date:"
         sub2 = "\n\n"
@@ -154,7 +233,20 @@ class EvaluateFailure():
     
     def get_repos_commits_dates_dict(self):
         ''' 
-        TBD
+        Formats dictonairy data strcutures needed for the evaluation process of the tool.
+        Dictionary for repos and commit ids
+        Dictionary for repos and commit dates
+        Dictionary for repos and index of currently checked-out commit
+
+        Arguments
+        ---------
+        splitted_log_info : array of string
+            Git repository log info but splitted per commit
+
+        Returns
+        -------
+        dates : array of strings
+            array contains the dates of commits of this repository, each date in one entry of the array
         '''
         for repo_path in self.repos_path:
             #print(repo_path)
@@ -184,7 +276,22 @@ class EvaluateFailure():
 
     def run_subprocess_with_capture_and_print(self, cmd, use_shell=False):
         ''' 
-        TBD
+        Runs a command line process and prints the output of this running process in terminal while running
+
+        Arguments
+        ---------
+        cmd : array of string
+            Command to be running
+
+        use_shell : boolean
+            A flag that helps the function handles some command line special characters (only if the command includes any)
+        
+        Returns
+        -------
+        stdout : array of strings
+            array contains output of this process
+        stderr : array of string
+            array contains the errors of this process
         '''
         p = subprocess.Popen(cmd,shell=use_shell,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -213,7 +320,18 @@ class EvaluateFailure():
     
     def clean_autoware(self):
         ''' 
-        TBD
+        Runs command for cleaning Autoware build, install, and log directories
+
+        Arguments
+        ---------
+        None
+        
+        Returns
+        -------
+        stdout : array of strings
+            array contains output of this process
+        stderr : array of string
+            array contains the errors of this process
         '''
         cmd = ["rm","-r","build/","install/", "log/"]
         stdout, stderr = self.run_subprocess_with_capture_and_print(cmd)
@@ -221,7 +339,18 @@ class EvaluateFailure():
     
     def compile_autoware(self):
         ''' 
-        TBD
+        Runs command for compiling Autoware
+
+        Arguments
+        ---------
+        None
+        
+        Returns
+        -------
+        stdout : array of strings
+            array of strings contains output of this process
+        stderr : array of string
+            array of strings contains the errors of this process
         '''
         cmd = ["colcon","build","--symlink-install","--cmake-args", "-DCMAKE_BUILD_TYPE=Debug", "-DCMAKE_EXPORT_COMPILE_COMMANDS=1"]
         stdout, stderr = self.run_subprocess_with_capture_and_print(cmd)
@@ -230,7 +359,16 @@ class EvaluateFailure():
 
     def check_autoware_compile_output(self, compile_stdout):
         ''' 
-        TBD
+        Checks the output of Autoware compilation, if it is successful or not
+
+        Arguments
+        ---------
+        compile_stdout : array of string
+            array of strings contains output of Autoware comppilation process
+        
+        Returns
+        -------
+        True/False
         '''
         for msg in compile_stdout:
             if "Aborted" in msg or "Failed" in msg:
@@ -239,7 +377,15 @@ class EvaluateFailure():
 
     def source_autoware(self):
         ''' 
-        TBD
+        Sources the needed enivronmental variables for Autoware
+
+        Arguments
+        ---------
+        None
+        
+        Returns
+        -------
+        None
         '''
         setup_script = self.autoware_path+"/install/setup.bash"
         load_envbash(setup_script, override=True)
@@ -247,7 +393,15 @@ class EvaluateFailure():
     
     def import_repos(self):
         ''' 
-        TBD
+        Imports commit ids provided in the repo file
+
+        Arguments
+        ---------
+        None
+        
+        Returns
+        -------
+        None
         '''
         cmd = "vcs import "+ self.autoware_path+"/src < "+ self.repos_file_path+ " && vcs pull "+ self.autoware_path+"/src"
         print(cmd)
