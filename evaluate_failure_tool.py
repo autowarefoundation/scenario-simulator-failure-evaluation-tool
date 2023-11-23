@@ -8,73 +8,55 @@ import datetime
 from envbash import load_envbash
 
 class EvaluateFailure():
-    def __init__(self):
+    def __init__(self, args):
         ''' 
-        Class constructor - used when setting arguments in the code
+        Class constructor
 
         Arguments
         ---------
-        None
+        args : Arguments to be used based on its length in two cases, either setting arguments in the code or from command line
 
         Returns
         -------
         None
         '''
+        number_of_arguments = len(args)
+        if number_of_arguments == 1:
+            # Please fill the following paths and dates if you are using the script
+            # without passing these arguments from command line
 
-        # Directories and Paths
-        # Please use absolute paths
-        self.repos_file_path = ""
-        self.autoware_path = ""
-        self.scenario_file_path = ""
-        self.osm_file_path = ""
-        self.pcd_file_path = ""
-
-        # Time period for searching
-        self.date_to_start_searching = ""  #Please write it in format of "year-month-day" like that "2023-09-31"
-        self.date_to_stop_searching  = ""  #Please write it in format of "year-month-day" like that "2023-09-31"
-
-        self.init()
-
-    def __init__(self, repo_file_path, autoware_path, scenario_file_path, osm_file_path, pcd_file_path, date_to_start_searching, date_to_stop_searching):
-        ''' 
-        Class constructor - used when setting arguments from command line
-
-        Arguments
-        ---------
-        repo_file_path : string
-            This is the path of the .repos file that includes the commits of the repos that you would like to 
-            start the evaluation process from.
-        autoware_path : string
-            This is the path of autoware in your local machine
-        scenario_file_path : string
-            This is the path of the failing scenario that would like to check which commits are causing this failure
-        osm_file_path : string
-            This is the osm map file used by this scenario
-        pcd_file_path : string
-            This is the pcd file associated with the used map file
-        date_to_start_searching : string
-            This is the date you would like the tool to start searching for commits.
-        date_to_stop_searching : string
-            This is the date you would like the tool to stop searching for commits.
-        
-        Returns
-        -------
-        None
-        '''
-        self.repos_file_path = repo_file_path
-        self.autoware_path = autoware_path
-        self.scenario_file_path = scenario_file_path
-        self.osm_file_path = osm_file_path
-        self.pcd_file_path = pcd_file_path
-        self.date_to_start_searching = date_to_start_searching
-        self.date_to_stop_searching = date_to_stop_searching
+            # # Please use absolute paths
+            self.repos_file_path = ""
+            self.autoware_path = ""
+            self.scenario_file_path = ""
+            self.osm_file_path = ""
+            self.pcd_file_path = ""
+            
+            # Time period for searching
+            self.date_to_start_searching = ""  #Please write it in format of "year-month-day" like that "2023-09-31"
+            self.date_to_stop_searching  = ""  #Please write it in format of "year-month-day" like that "2023-09-31"
+            
+        elif number_of_arguments == 8:
+            # These arguments are passed from command line
+            self.repos_file_path = sys.argv[1]
+            self.autoware_path = sys.argv[2]
+            self.scenario_file_path = sys.argv[3]
+            self.osm_file_path = sys.argv[4]
+            self.pcd_file_path = sys.argv[5]
+            self.date_to_start_searching = sys.argv[6]
+            self.date_to_stop_searching = sys.argv[7]
+            
+        else:
+            print("Number of arguments is not sufficient to run the evaluation systems")
+            print("Please check the documentation and try again")
+            sys.exit()
 
         self.init()
 
     def init(self):
         ''' 
         This is an initialization function that is used to initialzize common variables and data structures.
-        This function is called by any of the class constructors before using any different function of the class.
+        This function is called by the class constructor before using any different functions of the class.
 
         Arguments
         ---------
@@ -625,23 +607,6 @@ class EvaluateFailure():
             self.create_last_changed_file()
 
 
-if __name__ == "__main__":
-    number_of_arguments = len(sys.argv)
-    if number_of_arguments == 1:
-        eval_fail = EvaluateFailure()
-    elif number_of_arguments == 8:
-        repo_file_path = sys.argv[1]
-        autoware_path = sys.argv[2]
-        scenario_file_path = sys.argv[3]
-        osm_file_path = sys.argv[4]
-        pcd_file_path = sys.argv[5]
-        date_to_start_searching = sys.argv[6]
-        date_to_stop_searching = sys.argv[7]
-
-        eval_fail = EvaluateFailure(repo_file_path, autoware_path, scenario_file_path, osm_file_path, pcd_file_path, date_to_start_searching, date_to_stop_searching)
-    else:
-        print("Number of arguments is not sufficient to run the evaluation systems")
-        print("Please check the documentation and try again")
-        sys.exit()
-    
+if __name__ == "__main__": 
+    eval_fail = EvaluateFailure(sys.argv)
     eval_fail.run()

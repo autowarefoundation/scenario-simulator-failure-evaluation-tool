@@ -60,7 +60,7 @@ When using date_to_start_searching, all repos have to be in the correct branch b
 - If you have set the arguments using code change in class constructor : 
 
   `python3 evaluate_failure_tool.py`
-- If you would like to pass the arguments from command line :
+- If you would like to pass the arguments from command line (**order matters)**:
   
   `python3 evaluate_failure_tool.py repos_file_path autoware_path scenario_file_path osm_file_path pcd_file_path date_to_start_searching date_to_stop_searching`
 
