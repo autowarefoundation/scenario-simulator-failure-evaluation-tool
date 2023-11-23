@@ -346,7 +346,7 @@ class EvaluateFailure():
         Arguments
         ---------
         compile_stdout : array of string
-            array of strings contains output of Autoware comppilation process
+            array of strings contains output of Autoware compilation process
         
         Returns
         -------
@@ -392,9 +392,18 @@ class EvaluateFailure():
         return stdout, stderr
     
     def checkout_at_start_date(self):
+        ''' 
+        Checks out repositories at a specific start date.
+
+        Arguments
+        ---------
+        None
+        
+        Returns
+        -------
+        None
+        '''
         for repo in self.repos_path:
-            if "autoware.universe" in repo:
-                continue
             repo_git = git.Git(repo)
             branch_name = repo_git.branch()
             os.chdir(repo)
@@ -409,7 +418,19 @@ class EvaluateFailure():
 
     def run_scenario_simulator(self):
         ''' 
-        TBD
+        Runs scenario simulator based on scenario, osm , and pcd provided.
+        It edits the scenario file and write down the proper paths of osm and pcd.
+
+        Arguments
+        ---------
+        None
+        
+        Returns
+        -------
+        stdout : array of strings
+            array of strings contains output of this process
+        stderr : array of string
+            array of strings contains the errors of this process
         '''
         with open(self.scenario_file_path, "r") as file:
             data = file.readlines()
@@ -439,7 +460,16 @@ class EvaluateFailure():
     
     def check_scenario_simulator_output(self, sim_stdout):
         ''' 
-        TBD
+        Checks the output of scenario simulator run, if it is successful or not
+
+        Arguments
+        ---------
+        sim_stdout : array of string
+            array of strings contains output of scenario simulator run process
+        
+        Returns
+        -------
+        True/False
         '''
         number_of_scenarios = 0
         number_of_successful_scenarios = 0
@@ -455,7 +485,17 @@ class EvaluateFailure():
     
     def get_and_print_repos_before_first_success(self, index):
         ''' 
-        TBD
+        This function finds and prints group of commits before scenario is firstly successful.
+        These commits are highly suspected for root cause of failure.
+
+        Arguments
+        ---------
+        index : int
+            Number of iteration in which scenario turned into succesful
+        
+        Returns
+        -------
+        None
         '''
         for repo in self.repos_commits_dict.keys():
             commit = "empty"
@@ -471,7 +511,17 @@ class EvaluateFailure():
 
     def create_failed_repo_file(self):
         ''' 
-        TBD
+        Creates .repos file with commits that are highly suspected to be causing the scenario failure
+        These commits are just before the scenario turned into successful.
+        The .repos file is saved in the same autoware_path.
+
+        Arguments
+        ---------
+        None
+        
+        Returns
+        -------
+        None
         '''
         failed_scenario_name = os.path.basename(os.path.normpath(self.scenario_file_path))
         failed_dotrepos_file_name = "scenario_"+failed_scenario_name+"_failed_commits.repos"
@@ -494,7 +544,16 @@ class EvaluateFailure():
     
     def create_last_changed_file(self):
         ''' 
-        TBD
+        Creates a txt file that indicates the repo name with its commit id that was recently changed nad turned
+        the scenario into successful.
+        
+        Arguments
+        ---------
+        None
+        
+        Returns
+        -------
+        None
         '''
         with open('last_changed_repo.txt','w') as last_changed_repo_file:
             last_changed_repo_file.write("Last changed repo was : " + self.last_changed_repo + "\n")
@@ -503,7 +562,17 @@ class EvaluateFailure():
 
     def create_mermaid_visualization(self):
         ''' 
-        TBD
+        Creates a readme file that includes mermaid syntax for visualizing the different repos and commit ids within the specified period.
+        The visualization highlights the commits that are recently checked-out. 
+        As well, it highlights the lastly checked-out commit that turned the scenario into successful
+        
+        Arguments
+        ---------
+        None
+        
+        Returns
+        -------
+        None
         '''
         with open('README.md','w') as mermaid_vis_file:
             mermaid_vis_file.write("```mermaid\n")
@@ -539,7 +608,16 @@ class EvaluateFailure():
 
     def run(self):
         ''' 
-        TBD
+        This is the main run function of the tool that calls different other functions.
+        It is used as well to handle the logic behind checking out process.
+        
+        Arguments
+        ---------
+        None
+        
+        Returns
+        -------
+        None
         '''
         scenario_pass = False
         index = -1

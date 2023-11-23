@@ -143,7 +143,6 @@ The visualization output comes in a README.md file and it is as well located for
 
 ## TO-DO:
 - Investigate global timeout
-- Complete the functions description instead of TBD
 - Draw a flowchart explaining how the tool works
 
 
