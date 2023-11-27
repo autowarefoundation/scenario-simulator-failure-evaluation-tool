@@ -139,11 +139,11 @@ The visualization output comes in a README.md file and it is as well located for
 | A commit with bright blue rhombus is the commit after the one that made the scenario successful and it is the commit highly suspected to be the one causing this failure.  	| ![red_rhombus](./design/bright_blue_rhombus.png) |
 
 
-
+## Flowchart
+![flowchart](./design/flowchart.svg)
 
 ## TO-DO:
 - Investigate global timeout
-- Draw a flowchart explaining how the tool works
 
 
 
