@@ -72,23 +72,8 @@ The tool does not perform any plausibility checks to the arguments passed from c
 Till this moment, it is the responsibility of the tool user to make sure that arguments are in correct order, correct format, and making sense, otherwise the tool will either crash or provide wrong output.
 ~~~
 
-### What does the tool do for you ?
-- The tool checks out the commits of all repositories specified in the .repos file, with nearest commit date to start date `date_to_start_searching`
-- The tool adds the paths of osm and pcd files in the scenario yaml file so you do not need to do that manually.
-- The tool cleans log, install, and build folders to start clean autoware compilation for your evaluation process
-- If the .repos file is not making autoware compile successfully, the tool will terminate and print a message for you in the command line to check and try again.
-- The tool sources the setup.bash file if autoware compilation is successful
-- The tool runs scenario simulator with the provided scenario file and checks if the scenario with all its iterations is passing or not
-- For the first time, if the scenario is passing with the repositories checked out at start date, the tool will let you know that it is already passing and no need to go over the repos.
-- If the scenario is failing with the repositories checked out at start date (expected), the tool will start iterating over the repos going back one by one until it stops by the search date you provided `date_to_stop_searching`.
-- Whenever the tool comes to a combination of commits that is making autoware not compiling, the tool does not invoke the scenario simulator.
-- When the tool comes to a combination of commits that is compiling autoware successfully and passing in the scenario simulator, it stops the searching process and prints and creates the output for you.
-- The tool provides a mermaid visualization for the Autoware user in order to easily check which commits were being used when the scenario passed
-
-For more details about how the tool works, please check the [flowchart](#flowchart) section.
-
 ### What is the expected output when a failing scenario becomes passing in one iteration ?
-- The tool provides the output printed in the command line and the same information in two separate files.
+- The tool provides some output printed in command line that you can see directly after the tool finished execution. But more imprtantly, the tool organizes the output for the user in the following files
   - `$scenario_name$_failed_commits.repos`
  
 	This is the .repos file that includes the commit ids that you use to start debugging autoware for that failing scenario. That means it includes the commit just before the successful trial.
@@ -111,7 +96,22 @@ These files are located in `autoware_path` after execution is done.
 - You can use the files under `testing_files` folder and follow [Initialization](#initialization) then [Usage](#usage) sections.
 - The output should be as described [here](#what-is-the-expected-output-when-a-failing-scenario-becomes-passing-in-one-iteration).
 
-### Visualization
+## What does the tool do for you ?
+- The tool checks out the commits of all repositories specified in the .repos file, with nearest commit date to start date `date_to_start_searching`
+- The tool adds the paths of osm and pcd files in the scenario yaml file so you do not need to do that manually.
+- The tool cleans log, install, and build folders to start clean autoware compilation for your evaluation process
+- If the .repos file is not making autoware compile successfully, the tool will terminate and print a message for you in the command line to check and try again.
+- The tool sources the setup.bash file if autoware compilation is successful
+- The tool runs scenario simulator with the provided scenario file and checks if the scenario with all its iterations is passing or not
+- For the first time, if the scenario is passing with the repositories checked out at start date, the tool will let you know that it is already passing and no need to go over the repos.
+- If the scenario is failing with the repositories checked out at start date (expected), the tool will start iterating over the repos going back one by one until it stops by the search date you provided `date_to_stop_searching`.
+- Whenever the tool comes to a combination of commits that is making autoware not compiling, the tool does not invoke the scenario simulator.
+- When the tool comes to a combination of commits that is compiling autoware successfully and passing in the scenario simulator, it stops the searching process and prints and creates the output for you.
+- The tool provides a mermaid visualization for the Autoware user in order to easily check which commits were being used when the scenario passed
+
+For more details about how the tool works, please check the [flowchart](#flowchart) section.
+
+## Visualization
 The visualization provided by scenario simulator failure evaluation tool is a simple representation of the different Autoware repositories and commits, indicating **_at the time of the scenario became successful_** which commit was checked out in different repositories, the commit that lastly checked-out that made the scenario successful, and the commit after it that is highly suspected to be the commit causing this failure.
 
 The visualization depends on [mermaid gantt chart](https://mermaid.js.org/syntax/gantt.html) syntax.
