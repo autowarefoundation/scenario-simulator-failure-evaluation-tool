@@ -21,8 +21,8 @@ It is expected to have improvements and fixes while testing it in different use 
 	`pip3 install envbash`
 
 ### Initialization
-- The tool supports both calling the script with passing needed arguments from command line or setting these needed arguments in the class constructor.
-- If the tool user would like to set the needed arguments in the class constructor, then s/he needs to open the python script, go to the first class constructor which is `def __init__(self):` and assign values for paths and search date.
+- The tool supports both calling the script with passing needed arguments from the command line or setting these arguments in the class constructor.
+- If the tool user would like to set the needed arguments in the class constructor, then s/he needs to open the python script, go to the class constructor which is `def __init__(self):` and assign values for paths and search date under the if statement `if number_of_arguments == 1:`
 	-  `repos_file_path`
     
     	This is the path of the .repos file that includes the commits of the repos that you would like to start the evaluation process from.
@@ -55,7 +55,7 @@ When using date_to_start_searching, all repos have to be in the correct branch b
 ~~~
 
 ### Usage
-- From command line, go to the directory of the `scenario-simulator-failure-evaluation-tool`
+- After cloning this repository, in a command line terminal go to the directory of the `scenario-simulator-failure-evaluation-tool`
 - Make sure that the `evaluate_failure_tool.py` has the permission to be executed as a program.
 - If you have set the arguments using code change in class constructor : 
 
@@ -69,32 +69,40 @@ When using date_to_start_searching, all repos have to be in the correct branch b
 
 ~~~
 The tool does not perform any plausibility checks to the arguments passed from command line, except the number of arguments.
-Till this moment, it is the responsibility of the tool user to make sure that arguments are correct and making sense, otherwise the tool will either crash or provide wrong output.
+Till this moment, it is the responsibility of the tool user to make sure that arguments are in correct order, correct format, and making sense, otherwise the tool will either crash or provide wrong output.
 ~~~
 
 ### What does the tool do for you ?
-- The tool checks out the commits specified by the .repos file
+- The tool checks out the commits of all repositories specified in the .repos file, with nearest commit date to start date `date_to_start_searching`
 - The tool adds the paths of osm and pcd files in the scenario yaml file so you do not need to do that manually.
 - The tool cleans log, install, and build folders to start clean autoware compilation for your evaluation process
 - If the .repos file is not making autoware compile successfully, the tool will terminate and print a message for you in the command line to check and try again.
 - The tool sources the setup.bash file if autoware compilation is successful
 - The tool runs scenario simulator with the provided scenario file and checks if the scenario with all its iterations is passing or not
-- If the scenario is passing with your .repos file, the tool will let you know that it is already passing and no need to go over the repos.
-- If the scenario is already failing with your .repos file (expected), the tool will start iterating over the repos going back one by one until it stops by the search date you provided.
-- Whenever the tool comes to a combination of commits that is making autoware not compiling, the tool does not invoke the scenario simulator
+- For the first time, if the scenario is passing with the repositories checked out at start date, the tool will let you know that it is already passing and no need to go over the repos.
+- If the scenario is failing with the repositories checked out at start date (expected), the tool will start iterating over the repos going back one by one until it stops by the search date you provided `date_to_stop_searching`.
+- Whenever the tool comes to a combination of commits that is making autoware not compiling, the tool does not invoke the scenario simulator.
 - When the tool comes to a combination of commits that is compiling autoware successfully and passing in the scenario simulator, it stops the searching process and prints and creates the output for you.
 - The tool provides a mermaid visualization for the Autoware user in order to easily check which commits were being used when the scenario passed
 
+For more details about how the tool works, please check the [flowchart](#flowchart) section.
+
 ### What is the expected output when a failing scenario becomes passing in one iteration ?
 - The tool provides the output printed in the command line and the same information in two separate files.
-  - `last_changed_repo.txt`
-
-	This file includes the repo and commit id that are lately changed for the successful trial. That means, this is the commit that the tool just checked out, then the scenario passed.
   - `$scenario_name$_failed_commits.repos`
  
 	This is the .repos file that includes the commit ids that you use to start debugging autoware for that failing scenario. That means it includes the commit just before the successful trial.
 
-Both files are located in `autoware_path` after execution is done.
+  - `last_changed_repo.txt`
+
+	This file includes the repo and commit id that are lately changed for the successful trial. That means, this is the commit that the tool just checked out, then the scenario passed.
+
+  - `README.md`
+    
+	This is the mermaid visualization file that you can use to visualize the output of the evaluation process.
+
+
+These files are located in `autoware_path` after execution is done.
 
 ### How to make a quick test ?
 - Add a buggy commit to the autoware.universe that is making autoware keep the vehicle standstill in the start location.
@@ -108,9 +116,7 @@ The visualization provided by scenario simulator failure evaluation tool is a si
 
 The visualization depends on [mermaid gantt chart](https://mermaid.js.org/syntax/gantt.html) syntax.
 
-> It is worth mentioning that visualization does not include any commits that are older than date to stop searching `date_to_stop_searching`. This trimming made it the visualization more making sense and more comfortable for the user to understand, specially that there are repo that are not frequently changed and has a single commit very long time from the time we are doing the evaluation
-
-The visualization output comes in a README.md file and it is as well located for now in `autoware_path` like the other two files.
+> It is worth mentioning that visualization does not include any commits that are older than date to stop searching `date_to_stop_searching`. This trimming is necessary for having the visualization more making sense and comfortable for the user to understand, specially that we have noticed that there are some repositories that are not frequently changed, just had a single commit for very long time while we were doing some evaluation tests.
 
 ### How to visualize the provided output ?
 
