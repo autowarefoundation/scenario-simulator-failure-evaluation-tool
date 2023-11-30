@@ -148,8 +148,15 @@ The visualization depends on [mermaid gantt chart](https://mermaid.js.org/syntax
 ## Flowchart
 ![flowchart](./design/flowchart.svg)
 
-## TO-DO:
-- Investigate global timeout
+## Important Note about failures due to timeout:
+- Autoware Evaluator assigns the value of `global_time_out` as 885 seconds (in lots of cases).
+- This value will be different while testing in your local machine as it comes from main branch of scenario simulator launch file `scenario_test_runner.launch.py`
+- If the failure is happening due to timeout, please make sure that this value in your local machine is the same as used in Autoware Evaluator test
+- You can make sure of the value used for your scenario of interest by downloading the `SIMULATION LOG` file and check `global_time_out` value. This is an [example](https://evaluation.tier4.jp/evaluation/reports/235755a0-05bb-5a1e-bebc-d23f89c6ff5d/tests/40b8b073-8c7f-5c42-98e2-491ba4a82357/3bce2c77-443f-534f-b822-bbde1ac02adf/83ada411-24db-5032-9fbc-f90f60a7a268?project_id=awf) where you can download it.
 
 
+## Open Topics / Suggestions to be discussed
+- Make commit ids in visualization linked with the github link of this repository/commit with ability to double click and open it.
+- Generate issues after the tool finishes execution
+- CI/CD integration
 
